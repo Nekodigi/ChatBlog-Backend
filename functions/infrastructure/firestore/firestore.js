@@ -5,20 +5,20 @@ const db = admin.firestore();
 
 module.exports.db = db;
 
-exports.setDocument = (collection, document, data) => {//set exsisting doc field or add doc with "given name"
-    db.collection(collection).doc(document).set(data);
+exports.setDocument = async (collection, document, data) => {//set exsisting doc field or add doc with "given name"
+    await db.collection(collection).doc(document).set(data);
 }
 
-exports.addDocument = (collection, document, data) => {
-    db.collection(collection).doc(document).set(data);
+exports.addDocument = async (collection, document, data) => {
+    await db.collection(collection).doc(document).set(data);
 }
 
-exports.deleteDocument = (collection, document) => {
-    db.collection(collection).doc(document).delete();
+exports.deleteDocument = async (collection, document) => {
+    await db.collection(collection).doc(document).delete();
 }
 
 exports.getDocument = async (collection, document) => {//(await getDocument()).data() to get data
-    return db.collection(collection).doc(document).get();
+    return (await db.collection(collection).doc(document).get()).data();
 }
 
 exports.getDocuments = async (collection) => {
@@ -45,12 +45,12 @@ exports.extractDocumentsName = (snapshot) => {
     return snapshot.docs.map(doc => doc['_ref']['_path']['segments'][1]);
 }
 
-exports.updateDocument = (collection, document, data) => {//set exsisting doc field or add doc with "given name"
-    db.collection(collection).doc(document).update(data);
+exports.updateDocument = async (collection, document, data) => {//set exsisting doc field or add doc with "given name"
+    await db.collection(collection).doc(document).update(data);
 }
 
-exports.updateField = (collection, document, fieldName, value) => {//set exsisting doc field or add doc with "given name"
-    db.collection(collection).doc(document).set({[fieldName]: value}, {merge: true});//or .update({[fieldName]: value}) (does not create new when not exsist)
+exports.updateField = async (collection, document, fieldName, value) => {//set exsisting doc field or add doc with "given name"
+    await db.collection(collection).doc(document).set({[fieldName]: value}, {merge: true});//or .update({[fieldName]: value}) (does not create new when not exsist)
 }
 
 exports.incrementField = (collection, document, fieldName, value) => {

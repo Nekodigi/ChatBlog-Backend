@@ -13,17 +13,15 @@ app.use(express.static('public'));//publicフォルダ内のCSSが使えるよ�
 
 app.get('/api', api.test)
 
-app.get('/contents', renderHandler.contents);
+app.get('/api/archive', api.archive);
+app.get('/api/archive/monthly/:YYMM', api.monthly_archive);
+app.get('/api/variable/monthly', api.monthly_count);
+app.get('/api/post', api.all_posts_path);
+app.get('/api/post/:id?', api.post);
+app.get('/api/preview/:id?', api.preview);
 
-app.get('/', renderHandler.contents);
-
-app.get('/contents/:page?', renderHandler.page);
-
-app.get('/preview/:page?', renderHandler.preview);
-
-app.get('/approve/:page?', renderHandler.approve);
-
-app.get('/deny/:page?', renderHandler.deny);
+app.post('/api/approve/:id?', api.approve);
+app.post('/api/deny/:id?', api.deny);
   
 app.post('/webhook', middlewareConfig, line.eventAction);
 

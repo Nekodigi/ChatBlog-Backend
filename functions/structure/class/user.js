@@ -5,6 +5,10 @@ const gmail = require("../../infrastructure/gmail/gmail");
 const Post = require("./post");
 const { check_post } = require("../../structure/const/field");
 const status = require("../../structure/const/status");
+const { deleteAll } = require("../../infrastructure/firebaseStorage/firebaseStorage");
+const date = require('date-and-time');//npm install date-and-time https://www.geeksforgeeks.org/node-js-date-format-api/
+const { randomChar } = require("../../util/random");
+const { getHash } = require("../../infrastructure/crypt/hash");
 
 class User{
     constructor(){
@@ -13,39 +17,30 @@ class User{
     //(await) replace Constructor
     static async build(id){
         var user = new User();
-        user[field.id] = id;
-        var userData = (await firestore.getDocument("users", id)).data();
+        var userData = await firestore.getDocument("users", id);
         if(userData == undefined){
-            var defaultField = {[field.id]:id, [field.status]:"", [field.sub_status]:"", [field.created_date]:new Date(), [field.post_id]:"", [field.is_admin]:false, [field.check_post]:false, [field.group_id]:""};
-            firestore.setDocument("users", id, defaultField);//use variable for dictionary initialization
-            user.setStatus(status.follow, "");
+            var defaultData = {[field.id]:id, [field.status]:status.follow, [field.sub_status]:"", [field.created_date]:new Date(), [field.post_id]:"", [field.name]:"", [field.is_admin]:false, [field.email]:"", [field.check_post]:false, [field.group_id]:""};
+            await firestore.setDocument("users", id, defaultData);//use variable for dictionary initialization
+            Object.assign(user, defaultData);
         }else{
-            var keys = Object.keys(userData);
-            keys.forEach(key => {//just want to add value not Object.assign(user, );
-                user[key] = userData[key];
-            });
+            Object.assign(user, userData);
             if(!(user[field.post_id] === "" || user[field.post_id] === undefined)){
-                user[field.post] = Post.build();
+                user[field.post] = await Post.build(user[field.post_id], user[field.id]);
             }
         }
+        user[field.id] = id;
         return user;
     }
 
-    resetImageData(){
-        this.setField(field.imageUrl, JSON.stringify([]));
-        this.setField(field.imageName, JSON.stringify([]));
+    reset(){
+        if(this[field.post] !== undefined){this[field.post].delete();this.setField(field.post_id, "")}
     }
 
-    getPostData(){
-        return {
-            [field.status]  : status.waitingApproval,
-            [field.userId]  : this[field.userId],
-            [field.title]   : this[field.title],
-            [field.body]    : this[field.body],
-            [field.imageUrl]: this[field.imageUrl],
-            [field.id]      : this[field.id],
-            [field.date]    : new Date()
-        }
+    async newPost(){
+        if(this[field.post] !== undefined){this[field.post].delete();this.setField(field.post_id, "")}
+
+        this[field.post] = await Post.build(date.format(new Date(), "YYMMDD")+randomChar(2), this[field.id]);
+        this.setField(field.post_id, this[field.post].id);
     }
 
     getStatus(){
@@ -64,34 +59,35 @@ class User{
         firestore.updateField("users", this[field.id], field.sub_status, sub_status);
     }
 
-    setField(field, value){
-        this[field] = value;
-        firestore.updateField("users", this[field.id], field, value);
+    setField(field_, value){
+        this[field_] = value;
+        firestore.updateField("users", this[field.id], field_, value);
     }
 
     async sendMail(){
-        var admins = await firestore.getDocumentsWhere("admins", "checkPost", "==", true);
-        var posts = await firestore.getDocumentsWhere("preview", "status", "==", status.waitingApproval);
+        var admins = await firestore.getDocumentsWhere("users", field.check_post, "==", true);
+        var posts = await firestore.getDocumentsWhere("posts", "status", "==", status.waiting_approval);
 
         if(posts.length === 0)return;
         var body = "";
         body += posts.length+"件の記事が未確認です。記事を確認するリンクを開いて、承認・却下のどちらかのリンクを開いてください。\n";
 
         posts.forEach((post, i) => {
-            body+=`＝＝＝＝＝${i+1}件目＝＝＝＝＝\nタイトル：${post["title"]}\n`;
-            body+=`記事を確認する。\n${projectURL()}/preview/${post["id"]}\n`;
-            body+=`記事を承認する。\n${projectURL()}/approve/${post["id"]}\n`;
-            body+=`記事を却下する。\n${projectURL()}/deny/${post["id"]}\n`;
+            body+=`＝＝＝＝＝${i+1}件目＝＝＝＝＝\nタイトル：${post[field.title]}\n`;
+            body+=`記事を確認する。\n${projectURL()}/preview/${post[field.id]}\n`;
+            body+=`記事を承認する。\n${projectURL()}/approve/${post[field.id]}?hash=${getHash(post[field.id])}\n`;
+            body+=`記事を却下する。\n${projectURL()}/deny/${post[field.id]}?hash=${getHash(post[field.id])}\n`;
         });
-        admins.forEach(data => {
-            
-            gmail.send(data["email"], "新しい記事が投稿されました。ご確認ください。", body);
+        admins.forEach(admin => {
+            if(admin[field.check_post] === true)gmail.send(admin[field.email], "新しい記事が投稿されました。ご確認ください。", body);
         })
     }
 
-    post(){//tepmporary move to preview
+    doPost(){//tepmporary move to preview
         //firestore.incrementField("variable", "postPerMonth", this[field.id].substring(0, 4), 1);
-        firestore.setDocument("preview", this[field.id], this.getPostData());
+        this.setStatus(status.idle, "");
+        this.setField(field.post_id, "");
+        this[field.post].setStatus(status.waiting_approval, "");
         this.sendMail();
     }
 }

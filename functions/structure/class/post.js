@@ -1,3 +1,6 @@
+const { deleteAll } = require("../../infrastructure/firebaseStorage/firebaseStorage");
+const firestore = require("../../infrastructure/firestore/firestore")
+const field = require("../const/field");
 const status = require("../const/status");
 
 
@@ -6,23 +9,27 @@ class Post{
     }
 
     //(await) replace Constructor
-    static async build(id){
+    static async build(id, user_id){
         var post = new Post();
-        post.id = id;
-        var postData = (await firestore.getDocument("posts", id)).data();
+        var postData = await firestore.getDocument("posts", id);
         if(postData == undefined){
-            user[field.status] = status_;
-            var defaultField = {[field.id]:id, [field.status]:status_, [field.sub_status]:"", [field.created_date]:new Date(), [field], [field.post_id]:"", [field.is_admin]:false, [field.check_post]:false, [field.group_id]:""};
-            firestore.setDocument("posts", userId, defaultField);//use variable for dictionary initialization
-            post.setStatus(status.title, status.waiting);
+            var defaultField = {[field.id]:id, [field.status]:status.title, [field.sub_status]:status.confirming, [field.title]:"", [field.created_date]:new Date(), [field.published_date]:new Date(), [field.image_paths]:[], [field.body]:"", [field.user_id]:user_id, [field.is_published]:false, [field.related_object_0]:"", [field.location]:""};
+            firestore.setDocument("posts", id, defaultField);//use variable for dictionary initialization
+            Object.assign(post, defaultField);
         }else{
-            var keys = Object.keys(postData);
-            //console.log(keys);
-            keys.forEach(key => {
-                post[key] = postData[key];
-            });
+            Object.assign(post, postData);
         }
-        return user;
+        post[field.id] = id;
+        return post;
+    }
+
+    async delete(){
+        this.deleteAllImage();
+        await firestore.deleteDocument("posts", this[field.id]);
+    }
+
+    deleteAllImage(){
+        deleteAll(this[field.image_paths]);
     }
 
     getStatus(){
@@ -41,9 +48,9 @@ class Post{
         firestore.updateField("posts", this[field.id], field.sub_status, sub_status);
     }
 
-    setField(field, value){
-        this[field] = value;
-        firestore.updateField("posts", this[field.id], field, value);
+    setField(field_, value){
+        this[field_] = value;
+        firestore.updateField("posts", this[field.id], field_, value);
     }
 }
 

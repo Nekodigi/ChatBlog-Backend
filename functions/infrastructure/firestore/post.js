@@ -1,30 +1,40 @@
+const status = require("../../structure/const/status");
 const firestore = require("./firestore");
 const db = firestore.db;
 
+exports.getPostsBetween = async (start, end) => {
+    let snapshot = await db.collection("posts").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
+    return firestore.extractDocumentsData(snapshot);
+}
+
+async function getPostsAfter(startAfter, limit){
+    let snapshot = await db.collection("posts").orderBy("id", "desc").startAfter(startAfter).limit(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
+    return firestore.extractDocumentsData(snapshot);
+}
+exports.getPostsAfter = getPostsAfter;
+
+async function getPostsBefore(endBefore, limit){
+    let snapshot = await db.collection("posts").orderBy("id", "desc").endBefore(endBefore).limitToLast(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
+    return firestore.extractDocumentsData(snapshot);
+}
+exports.getPostsBefore = getPostsBefore;
+
+
+
+
+
 async function getPostsBetweenAfter(start, end, startAfter, limit){
-    let snapshot = await db.collection("contents").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").startAfter(startAfter).limit(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
+    let snapshot = await db.collection("posts").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").startAfter(startAfter).limit(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
     return firestore.extractDocumentsData(snapshot);
 }
 exports.getPostsBetweenAfter = getPostsBetweenAfter;
 
 //include start exclude end
 async function getPostsBetweenBefore(start, end, endBefore, limit){
-    let snapshot = await db.collection("contents").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").endBefore(endBefore).limitToLast(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
+    let snapshot = await db.collection("posts").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").endBefore(endBefore).limitToLast(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
     return firestore.extractDocumentsData(snapshot);
 }
 exports.getPostsBetweenBefore = getPostsBetweenBefore;
-
-async function getPostsAfter(startAfter, limit){
-    let snapshot = await db.collection("contents").orderBy("id", "desc").startAfter(startAfter).limit(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
-    return firestore.extractDocumentsData(snapshot);
-}
-exports.getPostsAfter = getPostsAfter;
-
-async function getPostsBefore(endBefore, limit){
-    let snapshot = await db.collection("contents").orderBy("id", "desc").endBefore(endBefore).limitToLast(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
-    return firestore.extractDocumentsData(snapshot);
-}
-exports.getPostsBefore = getPostsBefore;
 
 
 exports.validatePreviousDocument = async (start, end, previous) => {

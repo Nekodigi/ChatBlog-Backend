@@ -119,3 +119,7 @@ exports.request = (field) => {
 exports.text = (text) => {
     return {'type':'text', 'text':text}
 }
+
+exports.helpMessage = () => {//選択肢を示す。
+    return {'type': 'text','text':"今の作業を終了したいときは「"+keyword.resetAll+"」と話しかけてください。新しく記事を投稿したいときは「"+keyword.post+"」と話しかけてください。" };
+}
