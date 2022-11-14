@@ -7,6 +7,22 @@ exports.getPostsBetween = async (start, end) => {
     return firestore.extractDocumentsData(snapshot);
 }
 
+exports.getNextPost = (posts, id) => {
+    let i = posts.indexOf(id);
+    return posts[i+1]
+}
+
+exports.getPrevPost = (posts, id) => {
+    let i = posts.indexOf(id);
+    return posts[i-1]
+}
+
+
+
+
+
+//Legacy
+
 async function getPostsAfter(startAfter, limit){
     let snapshot = await db.collection("posts").orderBy("id", "desc").startAfter(startAfter).limit(limit).get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
     return firestore.extractDocumentsData(snapshot);

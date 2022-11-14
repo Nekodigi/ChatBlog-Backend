@@ -1,7 +1,7 @@
 const { getDocument, updateField } = require("../../infrastructure/firestore/firestore");
 const field = require("../../structure/const/field");
 const status = require("../../structure/const/status");
-const { getPosts, getPaths, getPostsArray, getPost, getPreview, getPostCount } = require("./data/posts");
+const { getPosts, getPaths, getPostsArray, getPost, getPreview, getPostCount, getposts } = require("./data/posts");
 const { API_KEY } = require("../../secret/FirebaseConfig.json");
 const { getHash } = require("../../infrastructure/crypt/hash");
 
@@ -32,7 +32,7 @@ exports.archive = async (req, res) => {
 
 exports.monthly_archive = async (req, res) => {
     let YYMM = Number(req.params.YYMM);
-    await postBetween_path_data(req, res, YYMM+"0000", (YYMM+1)+"zzzz", req.query.n ? Number(req.query.n) : 30);
+    await postBetween_path_data(req, res, YYMM+"0000", (YYMM)+"zzzz", req.query.n ? Number(req.query.n) : 30);
 }
 
 exports.post = async (req, res) => {

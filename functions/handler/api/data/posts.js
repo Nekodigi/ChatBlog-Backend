@@ -1,5 +1,5 @@
 const { getDocument } = require("../../../infrastructure/firestore/firestore");
-const { getPostsBetween, getPostsAfter, getPostsBefore } = require("../../../infrastructure/firestore/post");
+const { getPostsBetween, getPostsAfter, getPostsBefore, getNextPost, getPrevPost } = require("../../../infrastructure/firestore/post");
 const field = require("../../../structure/const/field");
 const status = require("../../../structure/const/status");
 
@@ -16,10 +16,11 @@ const reducePostData = (post) => {
 }
 
 //note! Approved only
-exports.getPosts = async (start, end) => {
+const getPosts = async (start, end) => {
     let posts = await getPostsBetween(start, end);
     return posts.filter(post => post[field.is_published] === true).map(post => reducePostData(post));
 }
+exports.getPosts = getPosts;
 
 exports.getPaths = (posts, size) => {
     let n = Math.ceil(posts.length/size);
@@ -40,13 +41,18 @@ exports.getPreview = async (id) => {
 }
 
 exports.getPost = async (id) => {
+    let posts = await getPosts("00000000", "zzzzzzzz");
+    let ids = posts.map(post => post[field.id]);
+    
     let post = reducePostData(await getDocument("posts", id));
+    
     let data = {post:post};
-    let next = (await getPostsAfter(id, 1))[0];
-    let prev = (await getPostsBefore(id, 1))[0];
-    if(next !== undefined)data.next_id = next.id; 
-    if(prev !== undefined)data.prev_id = prev.id; 
-    console.log(prev, next);
+    let next_id = ids[ids.indexOf(id)+1];
+    //let next = (await getPostsAfter(id, 1))[0];
+    let prev_id = ids[ids.indexOf(id)-1];
+    //let prev = (await getPostsBefore(id, 1))[0];
+    if(next_id !== undefined)data.next_id = next_id; 
+    if(prev_id !== undefined)data.prev_id = prev_id; 
     return data;
 }
 
