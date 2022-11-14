@@ -1,5 +1,5 @@
 const { getDocument } = require("../../../infrastructure/firestore/firestore");
-const { getPostsBetween, getPostsAfter, getPostsBefore, getNextPost, getPrevPost } = require("../../../infrastructure/firestore/post");
+const { getPostsBetween, getPostsAfter, getPostsBefore, getNextPost, getPrevPost, getPost } = require("../../../infrastructure/firestore/post");
 const field = require("../../../structure/const/field");
 const status = require("../../../structure/const/status");
 
@@ -37,14 +37,14 @@ exports.getPostsArray = (posts, size) => {
 }
 
 exports.getPreview = async (id) => {
-    return reducePostData(await getDocument("posts", id));
+    return reducePostData(await getPost(id));
 }
 
-exports.getPost = async (id) => {
+exports.getPostSide = async (id) => {
     let posts = await getPosts("00000000", "zzzzzzzz");
     let ids = posts.map(post => post[field.id]);
     
-    let post = reducePostData(await getDocument("posts", id));
+    let post = reducePostData(await getPost(id));//get document by name not id
     
     let data = {post:post};
     let next_id = ids[ids.indexOf(id)+1];

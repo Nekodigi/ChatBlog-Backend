@@ -8,5 +8,5 @@ const PORT = process.env.PORT || 4000;
 // app.listen(PORT);
 // console.log(`Server running at ${PORT}`);
 
-//exports.app = functions.https.onRequest(app);
+exports.app = functions.https.onRequest(app);
 

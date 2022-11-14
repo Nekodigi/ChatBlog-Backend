@@ -1,7 +1,8 @@
-const { getDocument, updateField } = require("../../infrastructure/firestore/firestore");
+const { getDocument, updateField, incrementField } = require("../../infrastructure/firestore/firestore");
+const { getPost } = require("../../infrastructure/firestore/post");
 const field = require("../../structure/const/field");
 const status = require("../../structure/const/status");
-const { getPosts, getPaths, getPostsArray, getPost, getPreview, getPostCount, getposts } = require("./data/posts");
+const { getPosts, getPaths, getPostsArray, getPreview, getPostCount, getposts, getPostSide } = require("./data/posts");
 const { API_KEY } = require("../../secret/FirebaseConfig.json");
 const { getHash } = require("../../infrastructure/crypt/hash");
 
@@ -36,7 +37,7 @@ exports.monthly_archive = async (req, res) => {
 }
 
 exports.post = async (req, res) => {
-    let data = await getPost(req.params.id);
+    let data = await getPostSide(req.params.id);
     res.send(data);
 }
 
@@ -61,10 +62,12 @@ exports.approve = async (req, res) => {
     if(hash !== req.query.hash){
         res.send("wrong_hash");
     }else{
-        let status_ = (await getDocument("posts", req.params.id))[field.status];
-        if(status_ === status.approved){
+        let post = await getPost(req.params.id);
+        let is_published = post[field.is_published];
+        if(is_published === true){
             res.send("already_approved");
         }else{
+            incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
             await updateField("posts", req.params.id, field.status, status.approved);
             await updateField("posts", req.params.id, field.is_published, true);
             res.send("change_to_approved");
@@ -78,10 +81,13 @@ exports.deny = async (req, res) => {
     if(hash !== req.query.hash){
         res.send("wrong_hash");
     }else{
-        let status_ = (await getDocument("posts", req.params.id))[field.status];
-        if(status_ === status.denied){
+        let post = await getPost(req.params.id);
+        let is_published = post[field.is_published];
+        console.log((await getPost(req.params.id)));
+        if(is_published === false){
             res.send("already_denied");
         }else{
+            incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
             await updateField("posts", req.params.id, field.status, status.denied);
             await updateField("posts", req.params.id, field.is_published, false);
             res.send("change_to_denied");

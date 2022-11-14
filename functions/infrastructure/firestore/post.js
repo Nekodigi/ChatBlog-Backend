@@ -7,6 +7,10 @@ exports.getPostsBetween = async (start, end) => {
     return firestore.extractDocumentsData(snapshot);
 }
 
+exports.getPost = async (id) => {//get document by id not document name
+    return firestore.extractDocumentsData(await db.collection("posts").where("id", "==", id).get())[0];
+}
+
 exports.getNextPost = (posts, id) => {
     let i = posts.indexOf(id);
     return posts[i+1]
