@@ -14,6 +14,7 @@
   "main": "app.js",
   "dependencies": {
     "@line/bot-sdk": "^7.5.2",
+    "@octokit/core": "^4.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "date-and-time": "^2.4.1",
