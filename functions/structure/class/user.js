@@ -74,9 +74,9 @@ class User{
 
         posts.forEach((post, i) => {
             body+=`＝＝＝＝＝${i+1}件目＝＝＝＝＝\nタイトル：${post[field.title]}\n`;
-            body+=`記事を確認する。\n${projectURL()}/preview/${post[field.id]}\n`;
-            body+=`記事を承認する。\n${projectURL()}/approve/${post[field.id]}?hash=${getHash(post[field.id])}\n`;
-            body+=`記事を却下する。\n${projectURL()}/deny/${post[field.id]}?hash=${getHash(post[field.id])}\n`;
+            body+=`記事を確認する。\n${projectURL()}/preview?id=${post[field.id]}\n`;
+            body+=`記事を承認する。\n${projectURL()}/approve?id=${post[field.id]}&hash=${getHash(post[field.id])}\n`;
+            body+=`記事を却下する。\n${projectURL()}/deny?id=${post[field.id]}&hash=${getHash(post[field.id])}\n`;
         });
         admins.forEach(admin => {
             if(admin[field.check_post] === true)gmail.send(admin[field.email], "新しい記事が投稿されました。ご確認ください。", body);

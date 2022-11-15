@@ -18,7 +18,7 @@ exports.post = async (user, event) => {
         case status.confirming:
             if(event.message.text === keyword.yes){
                 user.doPost();
-                return template.text(`投稿を確定しました！こちらのリンクからご確認ください。事務局が承認した後一覧からも確認できるようになります。\n${projectURL()}/preview/${user.post[field.id]}`);
+                return template.text(`投稿を確定しました！こちらのリンクからご確認ください。事務局が承認した後一覧からも確認できるようになります。\n${projectURL()}/preview?id=${user.post[field.id]}`);
             }else if(event.message.text === keyword.no){
                 return template.text(`最初からやり直したいときは「${keyword.resetAll}」と話しかけてください。`);
             }else{

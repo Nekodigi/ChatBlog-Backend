@@ -5,6 +5,8 @@ const status = require("../../structure/const/status");
 const { getPosts, getPaths, getPostsArray, getPreview, getPostCount, getposts, getPostSide } = require("./data/posts");
 const { API_KEY } = require("../../secret/FirebaseConfig.json");
 const { getHash } = require("../../infrastructure/crypt/hash");
+const { deploy } = require("../../secret/GithubConfig.json");
+const { workflowDispatch } = require("../../infrastructure/github/github");
 
 exports.test = async (req, res) => {
 
@@ -70,6 +72,7 @@ exports.approve = async (req, res) => {
             incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
             await updateField("posts", req.params.id, field.status, status.approved);
             await updateField("posts", req.params.id, field.is_published, true);
+            workflowDispatch(deploy);
             res.send("change_to_approved");
         }
     }
@@ -90,6 +93,7 @@ exports.deny = async (req, res) => {
             incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
             await updateField("posts", req.params.id, field.status, status.denied);
             await updateField("posts", req.params.id, field.is_published, false);
+            workflowDispatch(deploy);
             res.send("change_to_denied");
         }
     }

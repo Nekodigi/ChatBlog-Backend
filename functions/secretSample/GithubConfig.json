@@ -1,0 +1,9 @@
+{
+    "auth":"",
+    "deploy":{
+        "owner":    "",
+        "repo":     "",
+        "workflow_id":"",
+        "ref":      ""
+    }
+}
