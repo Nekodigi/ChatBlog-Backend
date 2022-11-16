@@ -1,6 +1,7 @@
 const admin = require("../firebase/firebase").admin;
 
 const firestore = admin.firestore;
+module.exports.firestore = firestore;
 const db = admin.firestore();
 
 module.exports.db = db;

@@ -8,6 +8,7 @@ const reducePostData = (post) => {
         [field.id]:post.id,
         [field.status]:post.status,
         [field.is_published]:post.is_published,
+        [field.is_applied]:post.is_applied,
         [field.title]:post.title,
         [field.created_date]:post.created_date,
         [field.image_paths]:post.image_paths,
