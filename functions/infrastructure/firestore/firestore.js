@@ -2,7 +2,7 @@ const admin = require("../firebase/firebase").admin;
 
 const firestore = admin.firestore;
 module.exports.firestore = firestore;
-const db = admin.firestore();
+const db = admin.firestore();//db = firestore
 
 module.exports.db = db;
 
@@ -52,6 +52,17 @@ exports.updateDocument = async (collection, document, data) => {//set exsisting 
 
 exports.updateField = async (collection, document, fieldName, value) => {//set exsisting doc field or add doc with "given name"
     await db.collection(collection).doc(document).set({[fieldName]: value}, {merge: true});//or .update({[fieldName]: value}) (does not create new when not exsist)
+}
+
+exports.updateFieldTransaction = async (collection, doc, fieldName, updateAction, res) =>{
+    await db.runTransaction(async (transaction) => {
+        const docRef = db.collection(collection).doc(doc);
+        const docSnap = await transaction.get(docRef);
+        const data = docSnap.data();
+        var field = data[fieldName];
+        field = updateAction(field, res);
+        transaction.update(docRef, {[fieldName]: field})
+    });
 }
 
 exports.incrementField = (collection, document, fieldName, value) => {

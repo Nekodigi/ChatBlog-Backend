@@ -10,7 +10,7 @@ const template = require("./templete");
 exports.post = async (user, event) => {
     switch(user.post.status){
         case status.title:
-            return sequence.getText(user.post, event.message.text.replace(/\n/g, ''), field.title, "タイトル", [status.image, status.confirming], (value, field_name) => template.text(`${field_name}を「${value}」で決定しました！\n次に画像を一枚ずつ送ってください。画像を追加しないときは「${keyword.yes2}」と伝えてくださいね。`));
+            return sequence.getText(user.post, event.message.text.replace(/\n/g, ''), field.title, "タイトル", [status.image, status.confirming], (value, field_name) => template.text(`${field_name}を「${value}」で決定しました！\n次に画像を送ってください。画像を追加しないときは「${keyword.yes2}」と伝えてくださいね。`));
         case status.image:
             return await sequence.getMultiImage(user.post, event, "画像", [status.body, status.confirming], (paths, field_name) => template.text(`${paths.length}枚の${field_name}を確定しました！\n次に本文を送ってください。`));
         case status.body:

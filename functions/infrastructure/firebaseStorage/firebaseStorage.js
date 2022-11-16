@@ -33,11 +33,12 @@ exports.getUrl = (path) => {
     return bucket.file(path).publicUrl();
 }
 
-exports.uploadResizedImage = async (image, size, dir) => {
+exports.uploadResizedImage = async (image, size, dir) => {//note! make public auto
     image = await sharp(image).resize({width:size, height:size, fit: sharp.fit.inside}).toBuffer();
     var now = new Date();
     const path = dir+"/"+date.format(now,'YYMM')+"/"+date.format(now, 'DD')+randomChar(2)+".png";
     await upload(image, path);
+    bucket.file(path).makePublic();
     return path;
     //const url = `https://firebasestorage.googleapis.com/v0/b/${projectDomain()}/o/${encodeURIComponent(fileName)}?alt=media`;
 }
