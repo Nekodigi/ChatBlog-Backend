@@ -1,4 +1,4 @@
-const { getDocument, updateField, incrementField } = require("../../infrastructure/firestore/firestore");
+const { getDocument, updateField, incrementField, db } = require("../../infrastructure/firestore/firestore");
 const { getPost } = require("../../infrastructure/firestore/post");
 const field = require("../../structure/const/field");
 const status = require("../../structure/const/status");
@@ -70,7 +70,8 @@ exports.approve = async (req, res) => {
             res.send("already_approved");
         }else{
             await updateField("posts", req.params.id, field.status, status.approved);
-            await updateField("posts", req.params.id, field.status, status.approved);
+            await updateField("posts", req.params.id, field.is_published, true);
+            await updateField("posts", req.params.id, field.is_applied, false);
             workflowDispatch(deploy);
 
             //when applied　　無限 publishが出来てしまう。
@@ -94,7 +95,10 @@ exports.deny = async (req, res) => {
         if(is_published === false){
             res.send("already_denied");
         }else{
+            incrementField("variables", "post_count", post[field.id].substring(0, 4), -1);
             await updateField("posts", req.params.id, field.status, status.denied);
+            await updateField("posts", req.params.id, field.is_published, false);
+            await updateField("posts", req.params.id, field.is_applied, false);
             workflowDispatch(deploy);
 
             //when applied
@@ -103,5 +107,16 @@ exports.deny = async (req, res) => {
             
             res.send("change_to_denied");
         }
+    }
+}
+
+exports.apply = async(req, res) => {
+    let hash = getHash("");
+    if(hash !== req.query.hash){
+        res.send("wrong_hash");
+    }else{
+        let docs = (await db.collection("posts").get()).docs;
+        docs.map(doc => doc.ref.update({"is_applied": true}))
+        res.send("change_to_applied");
     }
 }

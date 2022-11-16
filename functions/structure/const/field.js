@@ -18,6 +18,7 @@ const field = {
     image_paths     :"image_paths",
     user_id         :"user_id",
     is_published    :"is_published",
+    is_applied      :"is_applied",
     related_object_0:"related_object_0",//potential
     location        :"location"//potential
 

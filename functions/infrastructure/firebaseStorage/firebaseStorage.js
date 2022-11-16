@@ -1,13 +1,14 @@
 const sharp = require("sharp");
 
-const admin = require("../firebase/firebase").admin;
-const projectBucket = require("../firebase/firebase").projectBucket;
+const { admin, projectBucket }  = require("../firebase/firebase");
 const firebase = require("../firebase/firebase");
 const date = require('date-and-time');//npm install date-and-time https://www.geeksforgeeks.org/node-js-date-format-api/
 const { randomChar } = require("../../util/random");
 
 const storage = admin.storage();
+module.exports.storage = storage;
 const bucket = storage.bucket(projectBucket());
+module.exports.bucket = bucket;
 
 const upload = async (data, path) => {//upload from memory
     await bucket.file(path).save(data);
@@ -27,6 +28,10 @@ const delete_ = (path) => {
 }
 exports.delete_ = delete_;
 
+exports.getUrl = (path) => {
+    bucket.file(path).makePublic();
+    return bucket.file(path).publicUrl();
+}
 
 exports.uploadResizedImage = async (image, size, dir) => {
     image = await sharp(image).resize({width:size, height:size, fit: sharp.fit.inside}).toBuffer();

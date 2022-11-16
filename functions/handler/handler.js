@@ -25,6 +25,7 @@ app.get('/api/preview/:id?', api.preview);
 
 app.post('/api/approve/:id?', api.approve);
 app.post('/api/deny/:id?', api.deny);
+app.post('/api/apply', api.apply);
   
 app.post('/webhook', middlewareConfig, line.eventAction);
 
