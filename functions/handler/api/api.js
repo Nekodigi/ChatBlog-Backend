@@ -69,10 +69,14 @@ exports.approve = async (req, res) => {
         if(is_published === true){
             res.send("already_approved");
         }else{
-            incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
             await updateField("posts", req.params.id, field.status, status.approved);
-            await updateField("posts", req.params.id, field.is_published, true);
+            await updateField("posts", req.params.id, field.status, status.approved);
             workflowDispatch(deploy);
+
+            //when applied　　無限 publishが出来てしまう。
+            incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
+            await updateField("posts", req.params.id, field.is_published, true);
+
             res.send("change_to_approved");
         }
     }
@@ -90,10 +94,13 @@ exports.deny = async (req, res) => {
         if(is_published === false){
             res.send("already_denied");
         }else{
-            incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
             await updateField("posts", req.params.id, field.status, status.denied);
-            await updateField("posts", req.params.id, field.is_published, false);
             workflowDispatch(deploy);
+
+            //when applied
+            incrementField("variables", "post_count", post[field.id].substring(0, 4), 1);
+            await updateField("posts", req.params.id, field.is_published, false);
+            
             res.send("change_to_denied");
         }
     }
