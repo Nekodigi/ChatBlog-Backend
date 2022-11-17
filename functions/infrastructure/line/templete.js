@@ -2,7 +2,7 @@ const keyword = require("../../structure/const/keyword");
 const status = require("../../structure/const/status");
 const { imageURL } = require("../firebaseStorage/firebaseStorage");
 
-exports.postsList = (posts) => {
+exports.postsList = (posts, actions) => {
     return {
         "type": "template",
         "altText": "投稿を選んでください",
@@ -18,13 +18,7 @@ exports.postsList = (posts) => {
                         "label": "View detail",
                         "uri": "http://example.com/page/123"
                     },
-                    "actions": [
-                        {
-                          "type": "message",
-                          "label": "削除",
-                          "text": post.id
-                        }
-                    ]
+                    "actions": actions(post)
                 }
                 if(post.image_paths.length > 0){column["thumbnailImageUrl"] = imageURL(post.image_paths[0]);
                 }else{ column["thumbnailImageUrl"] = "https://storage.googleapis.com/foodbankbotdev.appspot.com/white.png";}

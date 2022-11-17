@@ -10,6 +10,7 @@ const field = {
     is_admin    :"is_admin",
     email       :"email",
     check_post  :"check_post",
+    var0        :"var0",
     group_id    :"group_id",//potential
     //post
     title           :"title",

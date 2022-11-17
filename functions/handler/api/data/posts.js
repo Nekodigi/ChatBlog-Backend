@@ -38,7 +38,8 @@ exports.getPostsArray = (posts, size) => {
 }
 
 exports.getPreview = async (id) => {
-    return reducePostData(await getPost(id));
+    let post = await getPost(id);
+    return post ? reducePostData(post) : undefined;
 }
 
 exports.getPostSide = async (id) => {
