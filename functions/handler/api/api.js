@@ -8,6 +8,11 @@ const { getHash } = require("../../infrastructure/crypto/hash");
 const { deploy } = require("../../secret/GithubConfig.json");
 const { workflowDispatch } = require("../../infrastructure/github/github");
 const User = require("../../structure/class/user");
+const Post = require("../../structure/class/post");
+const { client } = require("../../infrastructure/line/line");
+const { text } = require("../../infrastructure/line/templete");
+const { projectURL } = require("../../infrastructure/firebase/firebase");
+const e = require("cors");
 
 exports.test = async (req, res) => {
 
@@ -57,15 +62,17 @@ exports.monthly_count = async(req, res) => {
 
 exports.preview = async (req, res) => {
     let data = await getPreview(req.params.id);
-    res.send(data);
+    if(data === undefined) res.send("not_found");
+    else res.send(data);
 }
 
 exports.approve = async (req, res) => {
-    let hash = getHash(req.params.id);
+    let hash = getHash("approve"+req.params.id);
     if(hash !== req.query.hash){
         res.send("wrong_hash");
     }else{
         let post = await getPost(req.params.id);
+        if(post === undefined){res.send("not_found");return;}
         let is_published = post[field.is_published];
         if(is_published === true){
             if(post[field.status] === status.approved){
@@ -91,26 +98,24 @@ exports.approve = async (req, res) => {
 }
 
 exports.deny = async (req, res) => {
-    let hash = getHash(req.params.id);
+    let hash = getHash("deny"+req.params.id);
     if(hash !== req.query.hash){
         res.send("wrong_hash");
     }else{//まだ投稿されていない記事は拒否できず。状態が変わらない　　状態だけ変える
         let post = await getPost(req.params.id);
+        if(post === undefined){res.send("not_found");return;}
         let is_published = post[field.is_published];
-        //let sub_status = req.query.type;
         
         if(is_published === false){
             if(post[field.status] === status.denied){
                 res.send("already_denied");
             }else{
                 await updateField("posts", req.params.id, field.status, status.denied);
-                //await updateField("posts", req.params.id, field.sub_status, sub_status);
                 res.send("change_to_denied");
             }
         }else{
             incrementField("variables", "post_count", post[field.id].substring(0, 4), -1);
             await updateField("posts", req.params.id, field.status, status.denied);
-            //await updateField("posts", req.params.id, field.sub_status, sub_status);
             await updateField("posts", req.params.id, field.is_published, false);
             await updateField("posts", req.params.id, field.is_applied, false);
             workflowDispatch(deploy);
@@ -124,24 +129,34 @@ exports.deny = async (req, res) => {
     }
 }
 
+exports.delete = async (req, res) => {
+    let hash = getHash("delete"+req.params.id);
+    if(hash !== req.query.hash){
+        res.send("wrong_hash");
+    }else{//まだ投稿されていない記事は拒否できず。状態が変わらない　　状態だけ変える
+        let post = await Post.build(req.params.id, "");//this post soon deleted so, no need to worry wrong create
+        await post.delete();
+        res.send("deleted");
+    }
+}
+
 exports.apply = async(req, res) => {
-    let hash = getHash("");
+    let hash = getHash("apply");
     if(hash !== req.query.hash){
         res.send("wrong_hash");
     }else{
         let postsSnap = (await db.collection("posts").get()).docs;
         let posts = postsSnap.map(doc => doc.data());
         posts.forEach(post => {
-            switch(post.status){
-                case "approved":
-                    client.pushMessage("Uada2abc97a874ae0a223eb4ddc72691b", text(`「${post.title}」の投稿が承認され、一覧に表示されるようになりました！\n新しいURLからぜひチェックしてみてください。\n${projectURL()}/post/${post.id}}`));
-                    break;
-                case "denied":
-                    client.pushMessage("Uada2abc97a874ae0a223eb4ddc72691b", text(`「${post.title}」の投稿は拒否されたため、一覧には表示されません。お手数ですが、内容を修正した上で再投稿をお願いします。`));
-                    break;
-                case "deleted":
-                    client.pushMessage("Uada2abc97a874ae0a223eb4ddc72691b", text(`「${post.title}」の削除に成功しました。`));
-                    break;
+            if(post.is_applied === false){
+                switch(post.status){
+                    case "approved":
+                        client.pushMessage(post.user_id, text(`「${post.title}」の投稿が承認され、一覧に表示されるようになりました！\n新しいURLからぜひチェックしてみてください。\n${projectURL()}/post/${post.id}`));
+                        break;
+                    case "denied":
+                        client.pushMessage(post.user_id, text(`「${post.title}」の投稿は拒否されたため、一覧には表示されません。\nお手数ですが、内容を修正した上で再投稿をお願いします。`));
+                        break;
+                }
             }
             
         });

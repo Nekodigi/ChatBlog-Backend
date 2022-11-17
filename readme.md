@@ -131,6 +131,7 @@ check_post:true     post confirmation email will be sent if true.
 	is_admin:boolean
 	email:string
 	check_post:boolean
+	var0:string
 
 	//potential use
 	group_id:string

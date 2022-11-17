@@ -22,16 +22,16 @@ exports.message = async (event, user) => {
             case keyword.resetAll:
                 user.reset();
                 user.setStatus(status.idle, "");
-                return text("作業を中断しました。記事を投稿するときは「"+keyword.post+"」と話しかけてください。");//選択肢を示したうえでQuick Replyはあり。
+                return text("作業を中断しました。新しく「"+keyword.post+"」や「"+keyword.delete_post+"」ができます。");//選択肢を示したうえでQuick Replyはあり。
             case keyword.help:
                 return helpMessage(user);
             case keyword.delete_post:
-                user.setStatus(status.post_deleting, "");
+                user.setStatus(status.post_deleting, status.waiting);
                 let posts = await getPostsBetween("00000000", "zzzzzzzz");
                 posts = posts.filter(post => post.user_id===user.id);
                 posts = posts.filter(post => post.status===status.approved || post.status===status.waiting_approval);
                 posts = posts.slice(0, 10);
-                let res = [postsList(posts)];
+                let res = [postsList(posts,(post) => [{"type": "message","label": "削除","text": post.id}])];
                 res.push(text(`記事の削除ですね。\n削除したい記事のURLまたはIDを教えてください。\n最近の10件の投稿であれば、上の一覧からも選べます。`));
                 return res;
             case keyword.post:
