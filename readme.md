@@ -23,6 +23,9 @@ Then, email will sent to admin and they can approve or deny the post.
 - Interactive posting
 - Admin can manage post
 - Monthly archive
+- Post deletion
+- Post update notification
+- SSG
 # Getting Started
 ## Install
 `yarn install`
@@ -49,7 +52,7 @@ Then you can add admin with the following steps.
 ```javascript
 is_admin:true
 email:[your email]  
-check_post:true     post confirmation email will be sent if true.
+check_post:"line"or"email"or""     post confirmation email will be sent if email. line push messege will be sent if line. dont recieve if ""
 ```
 # Structure
 ## API JSON structure
@@ -131,6 +134,7 @@ check_post:true     post confirmation email will be sent if true.
 	is_admin:boolean
 	email:string
 	check_post:boolean
+	var0:string
 
 	//potential use
 	group_id:string
