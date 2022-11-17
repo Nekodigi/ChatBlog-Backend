@@ -49,7 +49,7 @@ Then you can add admin with the following steps.
 ```javascript
 is_admin:true
 email:[your email]  
-check_post:true     post confirmation email will be sent if true.
+check_post:"line"or"email"or""     post confirmation email will be sent if email. line push messege will be sent if line. dont recieve if ""
 ```
 # Structure
 ## API JSON structure
