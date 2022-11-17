@@ -1,9 +1,16 @@
 const status = require("../../structure/const/status");
 const { extractDocumentsData, db, getDocuments, extractDocumentsName, deleteDocument, addDocument, getDocument } = require("./firestore");
 
-exports.getPostsBetween = async (start, end) => {
-    let snapshot = await db.collection("posts").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").get();//.limit(limit)  HOW TO START AT END AT NOT VALUE
-    return extractDocumentsData(snapshot);
+exports.getPostsBetween = async (start, end, limit) => {
+    let snapshot;
+    if(!limit){
+        snapshot = await db.collection("posts").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").get();
+    }else{
+        snapshot = await db.collection("posts").where("id", ">=", start).where("id", "<", end).orderBy("id", "desc").limit(limit).get();
+    }
+    let posts = extractDocumentsData(snapshot);
+
+    return posts;
 }
 
 exports.getPostRef = (id) => {//get document by id not document name

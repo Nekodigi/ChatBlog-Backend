@@ -13,7 +13,7 @@ class Post{
         var post = new Post();
         var postData = await firestore.getDocument("posts", id);
         if(postData == undefined){
-            var defaultField = {[field.id]:id, [field.status]:status.title, [field.sub_status]:status.confirming, [field.title]:"", [field.created_date]:new Date(), [field.published_date]:new Date(), [field.image_paths]:[], [field.body]:"", [field.user_id]:user_id, [field.is_published]:false, [field.related_object_0]:"", [field.location]:""};
+            var defaultField = {[field.id]:id, [field.status]:status.title, [field.sub_status]:status.confirming, [field.title]:"", [field.created_date]:new Date(), [field.published_date]:new Date(), [field.image_paths]:[], [field.body]:"", [field.user_id]:user_id, [field.is_applied]:true, [field.is_published]:false, [field.related_object_0]:"", [field.location]:""};
             firestore.setDocument("posts", id, defaultField);//use variable for dictionary initialization
             Object.assign(post, defaultField);
         }else{

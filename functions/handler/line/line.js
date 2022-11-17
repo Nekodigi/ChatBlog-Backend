@@ -1,4 +1,4 @@
-var handleEvent = require('./handleEvent').handleEvent;
+var { handleEvent } = require('./handleEvent');
 
 exports.eventAction = (req, res) => {
     Promise

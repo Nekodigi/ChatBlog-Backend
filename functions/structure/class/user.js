@@ -8,7 +8,7 @@ const status = require("../../structure/const/status");
 const { deleteAll } = require("../../infrastructure/firebaseStorage/firebaseStorage");
 const date = require('date-and-time');//npm install date-and-time https://www.geeksforgeeks.org/node-js-date-format-api/
 const { randomChar } = require("../../util/random");
-const { getHash } = require("../../infrastructure/crypt/hash");
+const { getHash } = require("../../infrastructure/crypto/hash");
 
 class User{
     constructor(){

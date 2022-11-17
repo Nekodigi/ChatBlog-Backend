@@ -3,9 +3,9 @@ const status = require("../../structure/const/status");
 const field = require("../../structure/const/field");
 const templete = require("./templete");
 const { downloadContent } = require("./util");
-const { uploadResizedImage, imageURL } = require("../../infrastructure/firebaseStorage/firebaseStorage");
-const { db, updateFieldTransaction } = require("../../infrastructure/firestore/firestore");
-const { getPostRef } = require("../../infrastructure/firestore/post");
+const { uploadResizedImage, imageURL } = require("../firebaseStorage/firebaseStorage");
+const { db, updateFieldTransaction } = require("../firestore/firestore");
+const { getPostRef } = require("../firestore/post");
 
 
 exports.getText = (object, text, field_, field_name, next_status, confirmed_message, confirmed_action) => {//next_status is combination of status and sub_status
@@ -31,7 +31,7 @@ exports.getText = (object, text, field_, field_name, next_status, confirmed_mess
 
 
 //support only post
-exports.getMultiImage = async (object, event, field_name, next_status, confirmed_message, confirmed_action) => {
+exports.getMultiImage = async (user, object, event, field_name, next_status, confirmed_message, confirmed_action) => {
     if(event.message.type === "image"){
         try{
             var image = await downloadContent(event.message.id);//saveProcessedImage
@@ -62,7 +62,7 @@ exports.getMultiImage = async (object, event, field_name, next_status, confirmed
         }else if(event.message.text === keyword.no){
             return templete.text(`追加する${field_name}を送ってください。\n間違えて${field_name}を投稿して全て選び直す場合は「${keyword.image_reset_all}」と伝えてください。`);
         }else{
-            return templete.helpMessage();
+            return templete.helpMessage(user);
         }
     }
 }

@@ -1,4 +1,4 @@
-const client = require("./const").client;
+const client = require("./line").client;
 
 module.exports.downloadContent = (messageId) => {
     //GET IMAGE AS BUFFER

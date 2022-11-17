@@ -21,3 +21,11 @@ exports.projectDomain = () => {
 exports.projectURL = () => {
   return "https://" + projectID + ".web.app";
 }
+
+exports.URLtoPostID = (url) => {
+  let splitUrl = url.split("/");
+  let id = splitUrl[splitUrl.length-1].substring(0,8);
+  id = url.split("?id=")[1] ? url.split("?id=")[1].substring(0, 8) : id;
+  id = url.split("&id=")[1] ? url.split("&id=")[1].substring(0, 8) : id;
+  return id;
+}

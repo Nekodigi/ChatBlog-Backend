@@ -2,8 +2,8 @@ const { projectURL } = require("../../infrastructure/firebase/firebase");
 const field = require("../../structure/const/field");
 const keyword = require("../../structure/const/keyword");
 const status = require("../../structure/const/status");
-const sequence = require("./sequence");
-const template = require("./templete");
+const sequence = require("../../infrastructure/line/sequence");
+const template = require("../../infrastructure/line/templete");
 
 
 
@@ -12,7 +12,7 @@ exports.post = async (user, event) => {
         case status.title:
             return sequence.getText(user.post, event.message.text.replace(/\n/g, ''), field.title, "タイトル", [status.image, status.confirming], (value, field_name) => template.text(`${field_name}を「${value}」で決定しました！\n次に画像を送ってください。画像を追加しないときは「${keyword.yes2}」と伝えてくださいね。`));
         case status.image:
-            return await sequence.getMultiImage(user.post, event, "画像", [status.body, status.confirming], (paths, field_name) => template.text(`${paths.length}枚の${field_name}を確定しました！\n次に本文を送ってください。`));
+            return await sequence.getMultiImage(user, user.post, event, "画像", [status.body, status.confirming], (paths, field_name) => template.text(`${paths.length}枚の${field_name}を確定しました！\n次に本文を送ってください。`));
         case status.body:
             return sequence.getText(user.post, event.message.text, field.body, "本文", [status.confirming, status.confirming], (value, field_name) => template.confirm(`${field_name}を決定しました！記事の内容に間違いはないですか？`));
         case status.confirming:

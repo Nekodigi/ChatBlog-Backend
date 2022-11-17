@@ -1,7 +1,44 @@
 const keyword = require("../../structure/const/keyword");
+const status = require("../../structure/const/status");
+const { imageURL } = require("../firebaseStorage/firebaseStorage");
+
+exports.postsList = (posts) => {
+    return {
+        "type": "template",
+        "altText": "投稿を選んでください",
+        "template": {
+          "type": "carousel",
+          "columns": 
+            posts.map(post => {
+                let column = {
+                    "title":post.title.substring(0,40).replace(/\n/g, ""),//max 40
+                    "text":post.body.substring(0,60).replace(/\n/g, ""),//max 60 with image max  120 without image
+                    "defaultAction": {
+                        "type": "uri",
+                        "label": "View detail",
+                        "uri": "http://example.com/page/123"
+                    },
+                    "actions": [
+                        {
+                          "type": "message",
+                          "label": "削除",
+                          "text": post.id
+                        }
+                    ]
+                }
+                if(post.image_paths.length > 0){column["thumbnailImageUrl"] = imageURL(post.image_paths[0]);
+                }else{ column["thumbnailImageUrl"] = "https://storage.googleapis.com/foodbankbotdev.appspot.com/white.png";}
+                return column;
+            })
+          ,
+          "imageAspectRatio": "rectangle",
+          "imageSize": "cover"
+        }
+      }
+}
 
 exports.confirmText = (field, value) => {
-    return [{
+    return {
         "type": "template",
         "altText": "確認",
         "template": {
@@ -20,11 +57,11 @@ exports.confirmText = (field, value) => {
             ],
             "text": field+"は「"+value+"」で良いですか？"
         }
-      }];
+      };
 }
 
 exports.confirm = (discription) => {
-    return [{
+    return {
         "type": "template",
         "altText": "確認",
         "template": {
@@ -43,7 +80,7 @@ exports.confirm = (discription) => {
             ],
             "text": discription
         }
-      }];
+      };
 }
 
 exports.confirmImage = (url) => {
@@ -120,6 +157,12 @@ exports.text = (text) => {
     return {'type':'text', 'text':text}
 }
 
-exports.helpMessage = () => {//選択肢を示す。
-    return {'type': 'text','text':"今の作業を終了したいときは「"+keyword.resetAll+"」と話しかけてください。新しく記事を投稿したいときは「"+keyword.post+"」と話しかけてください。" };
+exports.helpMessage = (user) => {//選択肢を示す。
+    switch(user.status){
+        case status.idle:
+            return {'type': 'text','text':`「${keyword.post}」「${keyword.delete_post}」が出来ます。何をしますか？` };
+        default:
+            return {'type': 'text','text':"今の作業を終了したいときは「"+keyword.resetAll+"」と話しかけてください。" };
+    }
+    
 }

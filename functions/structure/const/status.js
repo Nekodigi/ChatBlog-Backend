@@ -4,6 +4,7 @@ const status = {
     name            :"name",
     idle            :"idle",
     posting         :"posting",
+    post_deleting   :"post_deleting",
 
     //post posting
     title           :"title",

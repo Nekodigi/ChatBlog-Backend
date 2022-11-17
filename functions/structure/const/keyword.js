@@ -1,6 +1,7 @@
 const keyword = {
     resetAll        : "全てやり直す",
-    post            : "投稿",
+    post            : "記事投稿",
+    delete_post     : "記事削除",
     post_yes        :"投稿決定",
     help            : "ヘルプ",
     yes             : "はい",

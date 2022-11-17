@@ -4,9 +4,10 @@ const app = require("./handler/handler").app;
 
 const PORT = process.env.PORT || 4000;
 
+if(process.argv[2] === "dev"){//0=node 1=filename
 //LOCAL DEVELOPMENT
-// app.listen(PORT);
-// console.log(`Server running at ${PORT}`);
-
-exports.app = functions.https.onRequest(app);
-
+    app.listen(PORT);
+    console.log(`Server running at ${PORT}`);
+}else{
+    exports.app = functions.https.onRequest(app);
+}

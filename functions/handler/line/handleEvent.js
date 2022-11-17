@@ -1,4 +1,4 @@
-const client = require("./const").client;
+const { client } = require("../../infrastructure/line/line");
 const User = require("../../structure/class/user");
 const field = require("../../structure/const/field");
 const status = require("../../structure/const/status");
@@ -24,6 +24,5 @@ exports.handleEvent = async function handleEvent(event) {
         }
         break;
     }
-  
     return client.replyMessage(event.replyToken, res);
   } 
