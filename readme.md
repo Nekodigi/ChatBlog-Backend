@@ -1,6 +1,6 @@
-# ChatPost-Backend
-Chat post is the blog that can be posted from LINE Bot.  
-This is backend for ChatPost that provides linebot support and a frontend API.  
+# ChatBlog-Backend
+Chat blog is the blog that can be posted from LINE Bot.  
+This is backend for ChatBlog that provides linebot support and a frontend API.  
 
 - [Demo](#demo)
 - [Features](#features)
