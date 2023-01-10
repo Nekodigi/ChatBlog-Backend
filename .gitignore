@@ -1,2 +1,4 @@
 *.env*
 credential/*.json
+
+.DS_Store
